@@ -33,23 +33,128 @@ title: Projects
 
   <hr style="margin:30px 0;">
 
-  <h3>Project 2: Mini Game</h3>
-  <p>
-    This is a simple interactive click game embedded directly in the webpage. Users can click the button to increase the score.
-    It demonstrates basic interaction design and real-time feedback.
-  </p>
+<h3>Project 2: Snake Game</h3>
+<p>
+  This is a simple snake game embedded directly in the webpage. Users can control the snake with the arrow keys.
+  The game demonstrates basic programming logic, interaction design, and real-time visual feedback.
+</p >
 
-  <div style="background:#f8fbff; padding:24px; border-radius:14px; margin-top:15px; text-align:center;">
-    <p style="font-size:20px; margin-bottom:15px;">Score: <span id="score">0</span></p>
-    <button onclick="increaseScore()" style="padding:12px 24px; font-size:18px; border:none; border-radius:10px; background:#4a67d6; color:white; cursor:pointer;">
-      Click Me
-    </button>
-    <button onclick="resetScore()" style="padding:12px 24px; font-size:18px; border:none; border-radius:10px; background:#999; color:white; cursor:pointer; margin-left:10px;">
-      Reset
-    </button>
-  </div>
+<div style="background:#f8fbff; padding:24px; border-radius:14px; margin-top:15px; text-align:center;">
+  <p style="font-size:18px; margin-bottom:10px;">
+    Score: <span id="snakeScore">0</span>
+  </p >
+  <canvas id="snakeCanvas" width="400" height="400" style="border:2px solid #4a67d6; border-radius:12px; background:#ffffff;"></canvas>
+  <p style="margin-top:15px; color:#555;">
+    Use ↑ ↓ ← → keys to control the snake
+  </p >
+  <button onclick="startGame()" style="padding:12px 24px; font-size:18px; border:none; border-radius:10px; background:#4a67d6; color:white; cursor:pointer;">
+    Start / Restart
+  </button>
+</div>
 
-  <script>
+<script>
+  const canvas = document.getElementById("snakeCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const box = 20;
+  const canvasSize = 400;
+  const rows = canvasSize / box;
+
+  let snake;
+  let direction;
+  let food;
+  let score;
+  let game;
+
+  function initGame() {
+    snake = [{ x: 9 * box, y: 10 * box }];
+    direction = "RIGHT";
+    food = {
+      x: Math.floor(Math.random() * rows) * box,
+      y: Math.floor(Math.random() * rows) * box
+    };
+    score = 0;
+    document.getElementById("snakeScore").textContent = score;
+  }
+
+  document.addEventListener("keydown", changeDirection);
+
+  function changeDirection(event) {
+    const key = event.key;
+    if (key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+    else if (key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+    else if (key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+    else if (key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+  }
+
+  function drawGame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < snake.length; i++) {
+      ctx.fillStyle = i === 0 ? "#4a67d6" : "#7f95e8";
+      ctx.fillRect(snake[i].x, snake[i].y, box, box);
+      ctx.strokeStyle = "#ffffff";
+      ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+    }
+
+    ctx.fillStyle = "#e74c3c";
+    ctx.fillRect(food.x, food.y, box, box);
+
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+
+    if (direction === "LEFT") snakeX -= box;
+    if (direction === "UP") snakeY -= box;
+    if (direction === "RIGHT") snakeX += box;
+    if (direction === "DOWN") snakeY += box;
+
+    if (snakeX === food.x && snakeY === food.y) {
+      score++;
+      document.getElementById("snakeScore").textContent = score;
+      food = {
+        x: Math.floor(Math.random() * rows) * box,
+        y: Math.floor(Math.random() * rows) * box
+      };
+    } else {
+      snake.pop();
+    }
+
+    const newHead = { x: snakeX, y: snakeY };
+
+    if (
+      snakeX < 0 ||
+      snakeY < 0 ||
+      snakeX >= canvasSize ||
+      snakeY >= canvasSize ||
+      collision(newHead, snake)
+    ) {
+      clearInterval(game);
+      alert("Game Over! Your score is: " + score);
+      return;
+    }
+
+    snake.unshift(newHead);
+  }
+
+  function collision(head, array) {
+    for (let i = 0; i < array.length; i++) {
+      if (head.x === array[i].x && head.y === array[i].y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function startGame() {
+    clearInterval(game);
+    initGame();
+    game = setInterval(drawGame, 150);
+  }
+
+  initGame();
+  drawGame();
+</script>
+  
     let score = 0;
 
     function increaseScore() {
