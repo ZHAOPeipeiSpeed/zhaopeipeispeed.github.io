@@ -6,221 +6,92 @@ title: Projects
 <div class="jumbotron" style="background:#ffffff; padding:30px; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); max-width:1000px; margin:40px auto; line-height:1.8;">
 
   <h2 style="text-align:center;">CDT501 Project Showcase</h2>
-  <p style="text-align:center;">
-    Music Generation, Video Processing, and Mini Game Development
+  <p style="text-align:center; font-size:20px; color:#555;">
+    Music Playback, Mini Game, and Processed Video Demonstration
   </p>
 
   <hr style="margin:30px 0;">
 
   <h3>Project Overview</h3>
   <p>
-    This page presents my CDT501 project work based on Python for Digital Media.
-    The main focus areas are music generation, video processing, and mini game development.
-    Through these examples, I explored how Python can be applied not only in technical programming,
-    but also in creative production and interactive media.
-  </p>
-
-  <h3>Project 1: Music Generation with Python</h3>
-  <p>
-    In this project, I used Python to generate a simple melody automatically.
-    This task shows that programming can also support creative work such as rhythm and melody generation.
-    It helped me understand that Python is not only for problem-solving and automation, but also for artistic experimentation.
-  </p>
-
-  <h4>Music Generation Code</h4>
-  <pre style="background:#f4f4f4; padding:16px; border-radius:10px; overflow-x:auto;">
-from mingus.containers import Bar, Track, Composition
-from mingus.midi import midi_file_out
-import random
-
-notes_pool = ["C", "D", "E", "G", "A"]
-
-bar = Bar()
-bar.set_meter((4, 4))
-bar.key = "C"
-
-for _ in range(8):
-    note_name = random.choice(notes_pool)
-    bar.place_notes(note_name, 8)
-
-track = Track()
-track + bar
-
-composition = Composition()
-composition.add_track(track)
-
-midi_file_out.write_Composition("melody.mid", composition)
-
-print("MIDI file generated successfully: melody.mid")
-  </pre>
-
-  <p>
-    This example creates a short MIDI melody automatically.
-    It is a simple practice project to demonstrate music generation with Python.
+    This page presents my CDT501 project work in a direct and interactive way. It includes a music playback section,
+    a simple mini game, and two processed videos. These examples show how digital media and programming can be combined
+    for creative presentation and interactive experience.
   </p>
 
   <hr style="margin:30px 0;">
 
-  <h3>Project 2: Video Processing with Python</h3>
+  <h3>Project 1: Music Playback</h3>
   <p>
-    In this project, I explored video editing with Python.
-    The main idea is to detect silent parts in a video and remove them automatically.
-    This function is useful because it can reduce repetitive manual editing and improve media production efficiency.
+    This section demonstrates the music result directly. Users can click play to listen to the generated or selected audio output.
   </p>
 
-  <h4>Video Processing Code</h4>
-  <pre style="background:#f4f4f4; padding:16px; border-radius:10px; overflow-x:auto;">
-import moviepy.editor as mp
-from pydub import AudioSegment
-from pydub.silence import detect_silence
-import os
-
-def remove_silence(video_path, output_path="output.mp4", min_silence_len=500, silence_thresh=-40):
-    video = mp.VideoFileClip(video_path)
-
-    temp_audio_path = "temp_audio.wav"
-    video.audio.write_audiofile(temp_audio_path, logger=None)
-
-    audio_segment = AudioSegment.from_wav(temp_audio_path)
-
-    silent_ranges = detect_silence(
-        audio_segment,
-        min_silence_len=min_silence_len,
-        silence_thresh=silence_thresh
-    )
-
-    keep_ranges = []
-    last_end = 0
-
-    for start, end in silent_ranges:
-        if start > last_end:
-            keep_ranges.append((last_end / 1000, start / 1000))
-        last_end = end
-
-    if last_end < len(audio_segment):
-        keep_ranges.append((last_end / 1000, len(audio_segment) / 1000))
-
-    if not silent_ranges or not keep_ranges:
-        video.write_videofile(output_path)
-    else:
-        clips = [video.subclip(start, end) for start, end in keep_ranges]
-        final_clip = mp.concatenate_videoclips(clips)
-        final_clip.write_videofile(output_path)
-        final_clip.close()
-
-    video.close()
-    if os.path.exists(temp_audio_path):
-        os.remove(temp_audio_path)
-
-    print(f"Processed video saved as: {output_path}")
-
-remove_silence("input.mp4", "edited_video.mp4")
-  </pre>
-
-  <p>
-    This project is based on the idea of automatic silence removal.
-    It demonstrates how Python can support practical video editing tasks in digital media.
-  </p>
+  <audio controls style="width:100%; margin-top:15px;">
+    <source src="music/demo.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
   <hr style="margin:30px 0;">
 
-  <h3>Project 3: Mini Game Development with Pygame</h3>
+  <h3>Project 2: Mini Game</h3>
   <p>
-    In this project, I built a simple 2D mini game with Pygame.
-    The player moves left and right to catch falling coins.
-    This project helped me practice interaction design, game logic, keyboard control, and score counting.
+    This is a simple interactive click game embedded directly in the webpage. Users can click the button to increase the score.
+    It demonstrates basic interaction design and real-time feedback.
   </p>
 
-  <h4>Mini Game Code</h4>
-  <pre style="background:#f4f4f4; padding:16px; border-radius:10px; overflow-x:auto;">
-import pygame
-import random
+  <div style="background:#f8fbff; padding:24px; border-radius:14px; margin-top:15px; text-align:center;">
+    <p style="font-size:20px; margin-bottom:15px;">Score: <span id="score">0</span></p>
+    <button onclick="increaseScore()" style="padding:12px 24px; font-size:18px; border:none; border-radius:10px; background:#4a67d6; color:white; cursor:pointer;">
+      Click Me
+    </button>
+    <button onclick="resetScore()" style="padding:12px 24px; font-size:18px; border:none; border-radius:10px; background:#999; color:white; cursor:pointer; margin-left:10px;">
+      Reset
+    </button>
+  </div>
 
-pygame.init()
+  <script>
+    let score = 0;
 
-WIDTH, HEIGHT = 600, 400
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Catch the Coin")
+    function increaseScore() {
+      score++;
+      document.getElementById("score").textContent = score;
+    }
 
-WHITE = (255, 255, 255)
-BLUE = (50, 100, 255)
-GOLD = (255, 215, 0)
-BLACK = (0, 0, 0)
+    function resetScore() {
+      score = 0;
+      document.getElementById("score").textContent = score;
+    }
+  </script>
 
-player_width = 80
-player_height = 20
-player_x = WIDTH // 2 - player_width // 2
-player_y = HEIGHT - 40
-player_speed = 8
+  <hr style="margin:30px 0;">
 
-coin_radius = 12
-coin_x = random.randint(20, WIDTH - 20)
-coin_y = 0
-coin_speed = 5
-
-score = 0
-font = pygame.font.SysFont(None, 36)
-
-clock = pygame.time.Clock()
-running = True
-
-while running:
-    clock.tick(30)
-    screen.fill(WHITE)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= player_speed
-    if keys[pygame.K_RIGHT] and player_x < WIDTH - player_width:
-        player_x += player_speed
-
-    coin_y += coin_speed
-
-    if (player_y < coin_y + coin_radius < player_y + player_height and
-        player_x < coin_x < player_x + player_width):
-        score += 1
-        coin_x = random.randint(20, WIDTH - 20)
-        coin_y = 0
-
-    if coin_y > HEIGHT:
-        coin_x = random.randint(20, WIDTH - 20)
-        coin_y = 0
-
-    pygame.draw.rect(screen, BLUE, (player_x, player_y, player_width, player_height))
-    pygame.draw.circle(screen, GOLD, (coin_x, coin_y), coin_radius)
-
-    score_text = font.render(f"Score: {score}", True, BLACK)
-    screen.blit(score_text, (20, 20))
-
-    pygame.display.flip()
-
-pygame.quit()
-  </pre>
-
+  <h3>Project 3: Processed Video 1</h3>
   <p>
-    This game is a beginner-friendly project, but it clearly shows how Python can be used to create interactive media experiences.
+    This section presents the first processed video result.
   </p>
+
+  <video controls style="width:100%; border-radius:12px; margin-top:15px;">
+    <source src="video/processed1.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <h3 style="margin-top:35px;">Project 4: Processed Video 2</h3>
+  <p>
+    This section presents the second processed video result.
+  </p>
+
+  <video controls style="width:100%; border-radius:12px; margin-top:15px;">
+    <source src="video/processed2.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 
   <hr style="margin:30px 0;">
 
   <h3>Reflection</h3>
   <p>
-    Through these projects, I learned that Python can support multiple areas of digital media, including music creation,
-    video editing, and game development. This matches the course content and helped me understand programming in a more creative way.
-  </p>
-  <p>
-    I also learned that AI-assisted programming can improve efficiency when generating code and understanding structure,
-    but testing and revision are still necessary. Therefore, programming requires both tool support and independent thinking.
-  </p>
-
-  <h3>Future Development</h3>
-  <p>
-    In the future, I hope to improve these projects by adding better interfaces, richer functions, and more polished media outputs.
-    I also want to continue exploring how Python and AI can be combined in digital media and creative applications.
+    Through this project page, I learned that programming can support not only technical tasks, but also direct media presentation,
+    interaction design, and creative communication. This project helped me understand how web pages can be used to display music,
+    games, and video results in an intuitive way.
   </p>
 
 </div>
